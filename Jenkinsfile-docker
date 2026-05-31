@@ -1,0 +1,57 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+    agent any
+
+    options { skipDefaultCheckout() }
+
+    environment {
+        DOCKER_IMAGE = "codec-qlhp-system"
+        SERVICE_NAME = "codec-qlhp-system"
+        NETWORK = "codec-order-meet"
+    }
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('check java') {
+            steps {
+                sh "java -version"
+            }
+        }
+
+        stage('clean') {
+            steps {
+                sh "chmod +x mvnw"
+                sh "./mvnw clean"
+            }
+        }
+        stage('packaging') {
+            steps {
+                sh "./mvnw verify -Pprod -DskipTests"
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+
+        stage('build') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE}:latest . "
+                sh "docker image ls | grep ${DOCKER_IMAGE}"
+
+                //clean to save disk
+                sh "docker image prune -f"
+            }
+        }
+
+        stage('deploy') {
+            steps {
+                sh "docker stop ${SERVICE_NAME} || true && docker rm -f ${SERVICE_NAME} || true "
+                sh "docker run -p 8001:8001 --name ${SERVICE_NAME} --network ${NETWORK} ${DOCKER_IMAGE}:latest";
+            }
+        }
+    }
+}

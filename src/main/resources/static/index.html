@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Web Push Test (Realtime Display)</title>
+  <style>
+    /* CSS nhúng trực tiếp (có thể thay thế bằng file css/style.css) */
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
+    .container { max-width: 700px; margin: 20px auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background-color: #ffffff; }
+    h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
+    p { line-height: 1.6; color: #555; }
+    button {
+      padding: 12px 25px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      display: block;
+      margin: 20px auto;
+    }
+    button:hover { background-color: #0056b3; }
+    #tokenDisplay, #notificationLog {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px dashed #d0d0d0;
+      border-radius: 8px;
+      word-wrap: break-word;
+      font-family: 'Courier New', Courier, monospace;
+      color: #444;
+    }
+    #tokenDisplay strong { color: #007bff; }
+    #notificationStatus {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .status-info { background-color: #e6f7ff; color: #007bff; }
+    .status-success { background-color: #e6ffe6; color: #28a745; }
+    .status-error { background-color: #ffe6e6; color: #dc3545; }
+    .log-item {
+      border-bottom: 1px dotted #eee;
+      padding: 8px 0;
+      font-size: 0.9em;
+    }
+    .log-item:last-child { border-bottom: none; }
+    pre { background-color: #e9ecef; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.85em; color: #333; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Firebase Web Push Notification Test</h1>
+  <p>Đây là một trang test đơn giản để hiển thị cách nhận và hiển thị thông báo Push từ Backend của bạn.</p>
+  <button id="requestPermissionButton">Yêu cầu Quyền & Lấy FCM Token</button>
+
+  <div id="notificationStatus" class="status-info">Kiểm tra trạng thái quyền...</div>
+
+  <div id="tokenDisplay">
+    FCM Token của bạn sẽ hiển thị ở đây: <br>
+    <span style="font-style: italic; color: #888;">(Chưa có token)</span>
+  </div>
+
+  <p>
+    Sau khi có **FCM Token**, hãy sao chép toàn bộ chuỗi token đó.
+    Sử dụng nó trong request POST từ Postman (hoặc công cụ tương tự) tới API Spring Boot của bạn
+    (`POST http://localhost:8080/api/v1/notification`) với body JSON như sau:
+  </p>
+  <pre><code>{
+  "recipientToken": "&lt;DÁN_FCM_TOKEN_CỦA_BẠN_VÀO_ĐÂY&gt;",
+  "title": "Thông báo Test!",
+  "body": "Nội dung thông báo realtime.",
+  "image": "https://cdn-icons-png.flaticon.com/512/1051/1051930.png",
+  "data": {
+    "key1": "value1",
+    "key2": "value2"
+  }
+}</code></pre>
+
+  <h2>Lịch sử Thông báo Nhận được:</h2>
+  <div id="notificationLog">
+    <p style="text-align: center; color: #888;">Chưa có thông báo nào được nhận.</p>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js';
+
+  // --- Bắt đầu cấu hình Firebase của bạn ---
+  // TODO: THAY THẾ 'YOUR_API_KEY' VÀ 'YOUR_APP_ID' BẰNG THÔNG TIN TỪ FIREBASE CONSOLE CỦA BẠN
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPpbrF-pCRTfeXie-jN7s5tCLpVVYCjxA", // <--- CẦN THAY THẾ! (Từ Firebase Console -> Project settings -> General -> Web app)
+    authDomain: "hoanglong-6349f.firebaseapp.com",
+    projectId: "hoanglong-6349f",
+    storageBucket: "hoanglong-6349f.appspot.com",
+    messagingSenderId: "1027839940044", // Đây là sender ID lấy từ JSON Service Account bạn đã cung cấp
+    appId: "1:451290352061:web:cd68eb8b850afb93b16ad4", // <--- CẦN THAY THẾ! (Từ Firebase Console -> Project settings -> General -> Web app)
+    measurementId: "G-DDLKVL8S6P" // Nếu có
+  };
+  // TODO: THAY THẾ 'YOUR_VAPID_KEY_HERE' BẰNG VAPID Public Key CỦA BẠN TỪ FIREBASE CONSOLE
+  // Tìm thấy trong Firebase Console -> Project settings -> Cloud Messaging -> Web configuration -> Key pair
+  const VAPID_KEY = 'BKTy8T5A0CNiGnnJrl2jU6IoGEJxUV7L1XHVT68_oy7wFLEnYTKeN0ZIKASG2_83QIq0WuoOszBXYxa0wc_3-AU'; // Ví dụ: "BGAxS...chuỗi rất dài...Sj5T"
+  // --- Kết thúc cấu hình Firebase của bạn ---
+
+  // Khởi tạo Firebase App
+  const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+
+  // Lấy các phần tử DOM
+  const tokenDisplay = document.getElementById('tokenDisplay');
+  const notificationStatus = document.getElementById('notificationStatus');
+  const requestPermissionButton = document.getElementById('requestPermissionButton');
+  const notificationLog = document.getElementById('notificationLog');
+
+  // Hàm cập nhật trạng thái trên UI
+  function updateStatus(message, type = 'info') {
+    notificationStatus.textContent = message;
+    notificationStatus.className = `status-${type}`;
+  }
+
+  // Hàm thêm log thông báo vào giao diện
+  function addNotificationToLog(title, body, data) {
+    if (notificationLog.querySelector('p')) { // Xóa thông báo "chưa có"
+      notificationLog.innerHTML = '';
+    }
+    const logItem = document.createElement('div');
+    logItem.className = 'log-item';
+    const timestamp = new Date().toLocaleTimeString();
+    logItem.innerHTML = `<strong>[${timestamp}] ${title || 'Không tiêu đề'}</strong><br>
+                                 Nội dung: ${body || 'Không nội dung'}<br>
+                                 Dữ liệu: ${JSON.stringify(data || {})}`;
+    notificationLog.prepend(logItem); // Thêm vào đầu danh sách (mới nhất lên trên)
+  }
+
+  // Hàm đăng ký Service Worker
+  async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        // Đăng ký Service Worker với đường dẫn tuyệt đối từ gốc của web server
+        // Đảm bảo firebase-messaging-sw.js nằm trong src/main/resources/static/
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+        updateStatus('Service Worker đã được đăng ký thành công.', 'success');
+        console.log('Service Worker registered with scope: ', registration.scope);
+        return registration;
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+        updateStatus(`Lỗi đăng ký Service Worker: ${error.message}`, 'error');
+        return null;
+      }
+    } else {
+      updateStatus('Trình duyệt của bạn không hỗ trợ Service Worker.', 'error');
+      console.warn('Service Worker is not supported in this browser.');
+      return null;
+    }
+  }
+
+  // Hàm để lấy FCM Token
+  async function retrieveToken() {
+    updateStatus('Đang yêu cầu quyền và lấy token...', 'info');
+    try {
+      // Đăng ký Service Worker trước khi lấy token
+      const registration = await registerServiceWorker();
+      if (!registration) {
+        throw new Error("Không thể đăng ký Service Worker.");
+      }
+
+      // Yêu cầu quyền và lấy token
+      const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+
+      if (currentToken) {
+        tokenDisplay.innerHTML = `FCM Token của bạn: <br> <strong>${currentToken}</strong>`;
+        updateStatus('Đã lấy được token! Hãy sao chép và sử dụng.', 'success');
+        console.log('FCM Registration Token:', currentToken);
+        // TODO: Ở đây, bạn sẽ gửi token này lên Backend của mình để lưu trữ
+        // Ví dụ: sendTokenToBackend(currentToken);
+      } else {
+        console.log('Không có token đăng ký. Yêu cầu quyền để tạo một token.');
+        updateStatus('Chưa có token. Vui lòng chấp nhận quyền thông báo từ trình duyệt.', 'info');
+      }
+    } catch (err) {
+      console.error('Lỗi khi lấy token:', err);
+      let errorMessage = `Lỗi: ${err.message}. Kiểm tra console để biết thêm chi tiết.`;
+      if (Notification.permission === 'denied') {
+        errorMessage += ' Bạn đã chặn thông báo. Vui lòng bật lại trong cài đặt trình duyệt.';
+      }
+      updateStatus(errorMessage, 'error');
+    }
+  }
+
+  // Lắng nghe sự kiện click nút
+  requestPermissionButton.addEventListener('click', retrieveToken);
+
+  // Xử lý thông báo khi ứng dụng đang ở nền trước (foreground)
+  onMessage(messaging, (payload) => {
+    console.log('Nhận được thông báo foreground:', payload);
+    updateStatus('Nhận được thông báo foreground!', 'info');
+    // Hiển thị thông báo ngay trên giao diện web
+    addNotificationToLog(
+      payload.notification ? payload.notification.title : 'Không tiêu đề',
+      payload.notification ? payload.notification.body : 'Không nội dung',
+      payload.data
+    );
+  });
+
+  // Kiểm tra trạng thái quyền khi tải trang
+  document.addEventListener('DOMContentLoaded', () => {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        updateStatus('Quyền thông báo đã được cấp. Sẵn sàng nhận thông báo.', 'success');
+        // Tự động lấy token nếu quyền đã cấp
+        retrieveToken();
+      } else if (Notification.permission === 'denied') {
+        updateStatus('Quyền thông báo đã bị từ chối. Vui lòng bật lại trong cài đặt trình duyệt.', 'error');
+      } else { // 'default'
+        updateStatus('Chưa có quyền thông báo. Nhấp vào nút để yêu cầu.', 'info');
+      }
+    } else {
+      updateStatus('Trình duyệt của bạn không hỗ trợ Notifications API.', 'error');
+    }
+  });
+</script>
+</body>
+</html>

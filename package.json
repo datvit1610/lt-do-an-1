@@ -1,0 +1,13 @@
+{
+  "name": "codec-system-application",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Codec System Application",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.15.0"
+  },
+  "cacheDirectories": [
+    "node_modules"
+  ]
+}

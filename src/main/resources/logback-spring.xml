@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+<configuration scan="true">
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+  <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+<!--  <include resource="org/springframework/boot/logging/logback/console-appender.xml" />-->
+
+  <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <mdc />
+        <context />
+        <logLevel />
+        <loggerName />
+        <threadName />
+        <message />
+        <logstashMarkers />
+        <stackTrace />
+      </providers>
+    </encoder>
+  </appender>
+  <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+  <!--Với mỗi profile sẽ hiển thị log ở các level khác nhau-->
+<!--  <springProfile name="dev, uat">-->
+<!--    <root level="INFO">-->
+<!--      <appender-ref ref="logstash"/>-->
+<!--      <appender-ref ref="STDOUT"/>-->
+<!--    </root>-->
+<!--    <logger name="codec.vn" level="DEBUG">-->
+<!--      <appender-ref ref="logstash"/>-->
+<!--      <appender-ref ref="STDOUT"/>-->
+<!--    </logger>-->
+<!--  </springProfile>-->
+<!--  &lt;!&ndash; Prod&ndash;&gt;-->
+<!--  <springProfile name="prod, default">-->
+<!--    <root level="INFO">-->
+<!--      <appender-ref ref="logstash"/>-->
+<!--      <appender-ref ref="STDOUT"/>-->
+<!--    </root>-->
+<!--    <logger name="QLHP" level="DEBUG">-->
+<!--      <appender-ref ref="logstash"/>-->
+<!--      <appender-ref ref="STDOUT"/>-->
+<!--    </logger>-->
+<!--  </springProfile>-->
+
+<!--  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--      <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+<!--      <maxHistory>90</maxHistory>-->
+<!--    </rollingPolicy>-->
+<!--    <encoder>-->
+<!--      <charset>utf-8</charset>-->
+<!--      <Pattern>%d %-5level [%thread] %logger{0}: %msg%n</Pattern>-->
+<!--    </encoder>-->
+<!--  </appender>-->
+
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <appender-ref ref="FILE"/>
+  </appender>
+
+  <logger name="com.codec.system" level="INFO" />
+  <logger name="ch.qos.logback" level="WARN" />
+  <logger name="com.sun" level="WARN" />
+  <logger name="org.springframework" level="WARN" />
+
+  <!-- jhipster-needle-logback-add-log -->
+
+  <root level="${log.level}">
+    <appender-ref ref="CONSOLE" />
+
+    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+
+    <appender-ref ref="FILE" />
+    <appender-ref ref="ASYNC"/>
+
+  </root>
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+</configuration>

@@ -1,0 +1,223 @@
+{
+  "actions" : [ {
+    "module" : "init",
+    "date" : "2023-05-16T17:46:32.917546Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "application-service-hexagonal-architecture-documentation",
+    "date" : "2023-05-16T17:46:32.944851Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "maven-java",
+    "date" : "2023-05-16T17:46:33.024808Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "dockerfile",
+    "date" : "2023-05-16T17:46:33.054917Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "java-base",
+    "date" : "2023-05-16T17:46:33.094265Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "sonar-qube-java-backend",
+    "date" : "2023-05-16T17:46:33.171922Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "java-enums",
+    "date" : "2023-05-16T17:46:33.216092Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "pagination-domain",
+    "date" : "2023-05-16T17:46:33.268748Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot",
+    "date" : "2023-05-16T17:46:33.352125Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "postgresql",
+    "date" : "2023-05-16T17:46:33.445985Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot-async",
+    "date" : "2023-05-16T17:46:33.508839Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot-webflux-empty",
+    "date" : "2023-05-16T17:46:33.560135Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "flyway",
+    "date" : "2023-05-16T17:46:33.608289Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "internationalized-errors",
+    "date" : "2023-05-16T17:46:33.670181Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "jpa-pagination",
+    "date" : "2023-05-16T17:46:33.748167Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot-webflux-netty",
+    "date" : "2023-05-16T17:46:33.824375Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot-cucumber-webflux",
+    "date" : "2023-05-16T17:46:33.935635Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "springdoc-webflux-openapi",
+    "date" : "2023-05-16T17:46:34.024625Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "rest-pagination",
+    "date" : "2023-05-16T17:46:34.090940Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  }, {
+    "module" : "spring-boot-cucumber-jpa-reset",
+    "date" : "2023-05-16T17:46:34.161289Z",
+    "properties" : {
+      "projectName" : "Codec System Application",
+      "baseName" : "CodecSystemApplication",
+      "packageName" : "com.codec.system",
+      "serverPort" : 8080,
+      "endOfLine" : "lf",
+      "indentSize" : 2
+    }
+  } ]
+}

@@ -1,0 +1,62 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+    agent any
+
+    options { skipDefaultCheckout() }
+
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('check java') {
+            steps {
+                sh "java -version"
+            }
+        }
+
+        stage('clean') {
+            steps {
+                sh "chmod +x mvnw"
+                sh "./mvnw clean"
+            }
+        }
+
+        stage('test') {
+            steps {
+                sh "./mvnw test"
+            }
+        }
+
+        stage('packaging') {
+            steps {
+                sh "./mvnw verify -Pprod -DskipTests"
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+
+        stage('sonar analysis') {
+            steps {
+                withSonarQubeEnv(installationName: 'SonarQube 192') {
+                    sh './mvnw sonar:sonar'
+                }
+            }
+        }
+
+        stage("quality gate") {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
+        stage('build') {
+            steps {
+                sh "cp ./target/amc-system-0.0.1-SNAPSHOT.jar /home/mb_amc/services/system"
+            }
+        }
+    }
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button onclick="getToken()">Lấy FCM Token</button>
+<p id="token" style="word-break:break-all"></p>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyB7katPoiGleR-N9o1Vm8AVE74sxknT2bM",
+    authDomain: "quan-ly-tai-san-79839.firebaseapp.com",
+    projectId: "quan-ly-tai-san-79839",
+    storageBucket: "quan-ly-tai-san-79839.firebasestorage.app",
+    messagingSenderId: "635558931195",
+    appId: "1:635558931195:web:8dadb8ebb3c3e37e841e5e",
+    measurementId: "G-7RJS9MDB9M"
+  });
+
+  const messaging = firebase.messaging();
+
+  async function getToken() {
+    try {
+      const token = await messaging.getToken({
+        vapidKey: "BN7u1E2kOL-6pZ7rDlTdE9mEK-B02EN34vbdkQOuHkQj2FA46iw9yBBg8egQc1nlwXlO3Pjx_2-4mD8aUIDS2XA"  // dán key pair từ bước 3 vào đây
+      });
+      document.getElementById("token").innerText = token;
+    } catch (e) {
+      alert("Lỗi: " + e.message);
+    }
+  }
+</script>
+</body>
+</html>

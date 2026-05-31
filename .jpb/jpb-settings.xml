@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpaLiquibaseChangesConfig">
+    <exclude-change idName="classes#id" tagName="addAutoIncrement" />
+    <exclude-change idName="action_log" tagName="dropTable" />
+    <exclude-change idName="classes#created_by" tagName="addColumn" />
+    <exclude-change idName="classes#class_code" tagName="addColumn" />
+    <exclude-change idName="classes#modified_by" tagName="addColumn" />
+    <exclude-change idName="classes#created_date" tagName="addColumn" />
+    <exclude-change idName="classes#modified_date" tagName="addColumn" />
+    <exclude-change idName="classes#class_code" tagName="addNotNullConstraint" />
+  </component>
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="codec-system-application" name="Default">
+        <packages>
+          <package value="com.codec.system" />
+        </packages>
+      </persistence-unit>
+    </persistence-units>
+  </component>
+</project>
