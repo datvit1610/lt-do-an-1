@@ -23,14 +23,15 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
   @Query(value = """
   select u.id as userId, u.roleId as roleId, u.username as userName, u.fullName as fullName,
   u.phoneNumber as phoneNumber, u.status as status, u.createdDate as createdDate, u.email as email, u.position as position,
-  u.modifiedDate as modifiedDate, creator.fullName as createdBy
+  u.modifiedDate as modifiedDate, creator.fullName as createdBy, r.name as roleName
   from UserEntity u
+  join RoleEntity r on r.id = u.roleId
   LEFT JOIN UserEntity creator ON creator.id = u.createdBy
   where (:userName IS NULL OR :userName ILIKE '' OR u.username ILIKE CONCAT('%', :userName, '%'))
   and (:status is null or u.status = :status)
   and (:phone is null or u.phoneNumber ILIKE CONCAT('%', :phone, '%'))
   and (:email is null or u.email ILIKE CONCAT('%', :email, '%'))
-  and u.deleted = false and u.accountType = 2
+  and u.deleted = false
   order by u.createdDate desc
 """)
   Page<Tuple> getAllUser(String userName, Integer status, String phone, String email, Pageable pageable);

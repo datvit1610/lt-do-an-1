@@ -85,11 +85,10 @@ public class WarehouseInventoryServiceImpl implements WarehouseInventoryService 
           response.setDaysUntilExpiry(
             Utils.calculateDaysUntilExpiry(response.getExpiryDate())
           );
-
-//        // Set status từ query
-//        Integer status = tuple.get(1, Integer.class);
-//        response.setStatus(status);
-
+          if (response.getStockStatus() == 2) {
+            response.setStatus(null);
+            response.setDaysUntilExpiry(null);
+          }
         return response;
       })
       .toList();
@@ -210,7 +209,7 @@ public class WarehouseInventoryServiceImpl implements WarehouseInventoryService 
       exportItem.setStorageLocation(item.getStorageLocation());
       exportItem.setNote(item.getNote());
       exportItem.setDaysUntilExpiry(item.getDaysUntilExpiry());
-      exportItem.setStatus(item.getStatus() == 1 ? "Còn hạn" : (item.getStatus() == 2 ? "Sắp hết hạn" : "Đã hết hạn"));
+      exportItem.setStatus(item.getStatus() == 1 ? "Còn hạn" : (item.getStatus() == 2 ? "Sắp hết hạn" : (item.getStatus() == 3 ? "Đã hết hạn" : "Vô thời hạn")));
       exportItem.setStockStatus(item.getStockStatus() == 1 ? "Còn hàng" : "Hết hàng");
       exportItem.setExportQuantity(item.getExportQuantity());
       exportItem.setRemainingQuantity(item.getRemainingQuantity());

@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     List<ProfileResponse.RoleInfo.Permission> permissionList = permissionRepository.getByRoleId(userEntity.get().getRoleId())
       .stream().map(ProfileResponse.RoleInfo.Permission::new).toList();
     List<String> permissions = permissionList.stream().map(ProfileResponse.RoleInfo.Permission::getName).toList();
-    String token = jwtUtil.generateToken(loginRequest.getUsername(), permissions, userEntity.get().getId(), userEntity.get().getAccountType());
+    String token = jwtUtil.generateToken(loginRequest.getUsername(), permissions, userEntity.get().getId());
     String refreshToken = jwtUtil.generateRefreshToken(loginRequest.getUsername());
 
     AuthResponse response = new AuthResponse();
@@ -102,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
     List<ProfileResponse.RoleInfo.Permission> permissionList = permissionRepository.getByRoleId(userEntity.get().getRoleId())
       .stream().map(ProfileResponse.RoleInfo.Permission::new).toList();
     List<String> permissions = permissionList.stream().map(ProfileResponse.RoleInfo.Permission::getName).toList();
-    String newAccessToken = jwtUtil.generateToken(username, permissions, userEntity.get().getId(), userEntity.get().getAccountType());
+    String newAccessToken = jwtUtil.generateToken(username, permissions, userEntity.get().getId());
     String newRefreshToken = jwtUtil.generateRefreshToken(username); // Optional: làm mới luôn
 
     AuthResponse response = new AuthResponse();
@@ -126,10 +126,12 @@ public class AuthServiceImpl implements AuthService {
     }
     ProfileResponse profileResponse = new ProfileResponse(
       userEntity.get().getId(),
+      userEntity.get().getUsername(),
       userEntity.get().getPhoneNumber(),
       userEntity.get().getFullName(),
       userEntity.get().getStatus(),
-      userEntity.get().getAccountType()
+      userEntity.get().getEmail(),
+      userEntity.get().getPosition()
     );
 
 

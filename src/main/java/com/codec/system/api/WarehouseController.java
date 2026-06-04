@@ -80,7 +80,7 @@ public class WarehouseController {
     @RequestParam(required = false) String origin,
     @RequestParam(required = false) String productDetail,
     @RequestParam(required = false) String storageLocation,
-    @RequestParam(required = false) Integer status, // 1: Còn hạn, 2: sắp hết hạn 3: Hết hạn
+    @RequestParam(required = false) Integer status, // 1: Còn hạn, 2: sắp hết hạn 3: Hết hạn 4: Vô thời hạn
     @RequestParam(required = false) Integer stockStatus, // 1: còn hàng, 2: hết hàng
     @RequestParam(required = false) Integer qrStatus, // 1: chưa quét, 2: đã quét
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate importDateFrom,

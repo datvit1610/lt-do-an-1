@@ -57,6 +57,8 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
            w.note AS note,
            w.qrCode AS qrCode,
            CASE
+               WHEN w.expiryDate IS NULL THEN 4
+               WHEN w.manufacturingDate IS NULL THEN 4
                WHEN w.expiryDate < :today THEN 3
                WHEN w.expiryDate <= :thresholdDate THEN 2
                ELSE 1
@@ -73,9 +75,15 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
       AND (CAST(:expiryDateTo   AS date) IS NULL OR w.expiryDate <= :expiryDateTo)
       AND (
           :status IS NULL
-          OR (:status = 1 AND (w.expiryDate IS NULL OR w.expiryDate > :thresholdDate))
-          OR (:status = 2 AND w.expiryDate >= :today AND w.expiryDate <= :thresholdDate)
-          OR (:status = 3 AND w.expiryDate < :today)
+          OR (
+              (
+                  (:status = 1 AND (w.expiryDate IS NULL OR w.expiryDate > :thresholdDate))
+                  OR (:status = 2 AND w.expiryDate >= :today AND w.expiryDate <= :thresholdDate)
+                  OR (:status = 3 AND w.expiryDate < :today)
+                  OR (:status = 4 AND (w.expiryDate IS NULL OR w.manufacturingDate IS NULL))
+              )
+              AND (w.importQuantity - w.exportQuantity) > 0
+          )
       )
       AND (
           :stockStatus IS NULL
@@ -132,6 +140,8 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
            CASE
                WHEN w.expiryDate < :today THEN 3
                WHEN w.expiryDate <= :thresholdDate THEN 2
+               WHEN w.expiryDate IS NULL THEN 4
+               WHEN w.manufacturingDate IS NULL THEN 4
                ELSE 1
            END AS status
     FROM WarehouseEntity w
@@ -175,6 +185,8 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
            CASE
                WHEN w.expiryDate < :today THEN 3
                WHEN w.expiryDate <= :thresholdDate THEN 2
+                WHEN w.expiryDate IS NULL THEN 4
+                WHEN w.manufacturingDate IS NULL THEN 4
                ELSE 1
            END AS status
     FROM WarehouseEntity w
@@ -189,9 +201,15 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
       AND (CAST(:expiryDateTo   AS date) IS NULL OR w.expiryDate <= :expiryDateTo)
       AND (
           :status IS NULL
-          OR (:status = 1 AND w.expiryDate > :thresholdDate)
-          OR (:status = 2 AND w.expiryDate >= :today AND w.expiryDate <= :thresholdDate)
-          OR (:status = 3 AND w.expiryDate < :today)
+          OR (
+              (
+                  (:status = 1 AND (w.expiryDate IS NULL OR w.expiryDate > :thresholdDate))
+                  OR (:status = 2 AND w.expiryDate >= :today AND w.expiryDate <= :thresholdDate)
+                  OR (:status = 3 AND w.expiryDate < :today)
+                  OR (:status = 4 AND (w.expiryDate IS NULL OR w.manufacturingDate IS NULL))
+              )
+              AND (w.importQuantity - w.exportQuantity) > 0
+          )
       )
       AND (
           :stockStatus IS NULL
@@ -265,9 +283,11 @@ public interface WarehouseRepository extends JpaRepository<WarehouseEntity, Stri
                                         @Param("thresholdDate") LocalDate thresholdDate);
 
   @Query("""
-    SELECT COUNT(w) FROM WarehouseEntity w
+    SELECT COALESCE(SUM(w.importQuantity - w.exportQuantity), 0)
+    FROM WarehouseEntity w
     WHERE w.expiryDate >= :today
       AND w.expiryDate <= :thresholdDate
+      AND w.deleted = false
     """)
   long countNearExpiry(@Param("today") LocalDate today,
                        @Param("thresholdDate") LocalDate thresholdDate);

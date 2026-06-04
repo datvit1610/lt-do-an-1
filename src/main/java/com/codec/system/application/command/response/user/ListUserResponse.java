@@ -14,6 +14,7 @@ import java.util.List;
 public class ListUserResponse {
   String userId;
   String roleId;
+  String roleName;
   String userName;
   String fullName;
   String email;
@@ -29,6 +30,7 @@ public class ListUserResponse {
   public ListUserResponse(Tuple tuple) {
     this.userId = tuple.get("userId", String.class);
     this.roleId = tuple.get("roleId", String.class);
+    this.roleName = tuple.get("roleName", String.class);
     this.userName = tuple.get("userName", String.class);
     this.fullName = tuple.get("fullName", String.class);
     this.email = tuple.get("email", String.class);

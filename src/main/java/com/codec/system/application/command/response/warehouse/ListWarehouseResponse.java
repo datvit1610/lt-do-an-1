@@ -59,7 +59,7 @@ public class ListWarehouseResponse {
   //cột số ngày còn hạn
   private String daysUntilExpiry;
 
-  private Integer status; // 1: Còn hạn, 2: sắp hết hạn 3: Hết hạn
+  private Integer status; // 1: Còn hạn, 2: sắp hết hạn 3: Hết hạn 4: Vô thời hạn
 
   //qrcode
   private String qrCode;

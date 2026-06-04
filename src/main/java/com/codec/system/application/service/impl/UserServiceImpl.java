@@ -71,7 +71,6 @@ public class UserServiceImpl implements UserService {
       userEntity.setPhoneNumber(request.getPhoneNumber());
       userEntity.setEmail(request.getEmail());
       userEntity.setPosition(request.getPosition());
-      userEntity.setAccountType(2);
       userEntity.setStatus(request.getStatus());
       userEntity.setRoleId(request.getRoleId());
       userEntity.setCreatedBy(userId);

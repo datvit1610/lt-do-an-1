@@ -319,7 +319,7 @@ public class Utils {
 
   public static String calculateDaysUntilExpiry(LocalDate expiryDate) {
     if (expiryDate == null) {
-      return "";
+      return "Vô thời hạn";
     }
     LocalDate today = LocalDate.now();
     // Hết hạn

@@ -32,12 +32,8 @@ public class UserEntity extends BaseEntity {
   String email;
 
   @Comment("Chức vụ")
-  @Column(name = "position")
+  @Column(name = "position") // quản lý, giảng viên, sinh viên
   String position;
-
-  @Comment("1: admin, 2: nhân viên")
-  @Column(name = "account_type")
-  Integer accountType; //1: admin, 2: nhân viên
 
   @Comment("1: hoạt động, 2: tạm ngưng")
   @Column(name = "status", nullable = false)

@@ -10,29 +10,22 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProfileResponse {
   String userId;
+  String username;
   String phoneNumber;
   String fullName;
   Integer status;
-  Integer accountType;
-  PublisherInfo publisherInfo;
   RoleInfo roleInfo;
+  String email;
+  String position;
 
-  public ProfileResponse(String userId , String phoneNumber, String fullName, Integer status, Integer accountType) {
+  public ProfileResponse(String userId , String username,  String phoneNumber, String fullName, Integer status,  String email, String position) {
     this.userId = userId;
+    this.username = username;
     this.phoneNumber = phoneNumber;
     this.fullName = fullName;
     this.status = status;
-    this.accountType = accountType;
-  }
-
-  @Data
-  public static class PublisherInfo {
-    String guid;
-    String name;
-    String email;
-    String phoneNumber;
-    String contractNumber;
-    String address;
+    this.email = email;
+    this.position = position;
   }
 
   @Data

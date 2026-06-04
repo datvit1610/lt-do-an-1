@@ -30,14 +30,13 @@ public class JwtUtil {
     this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
   }
 
-  public String generateToken(String username, List<String> permissions, String userId, Integer accountType) {
+  public String generateToken(String username, List<String> permissions, String userId) {
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + expiration);
 
     return Jwts.builder()
       .setSubject(username)
       .claim("userId", userId)
-      .claim("accountType", accountType)
       .claim("permissions", permissions)
       .setIssuedAt(now)
       .setExpiration(expiryDate)
@@ -92,16 +91,6 @@ public class JwtUtil {
     return claims.get("userId", String.class);
   }
 
-  public Integer getAccountTypeFromToken(String token) {
-    Claims claims = Jwts.parserBuilder()
-      .setSigningKey(key)
-      .build()
-      .parseClaimsJws(token)
-      .getBody();
-
-    return claims.get("accountType", Integer.class);
-  }
-
 
   public List<String> getPermissionsFromToken(String token) {
     Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
@@ -134,21 +123,6 @@ public class JwtUtil {
         .getBody();
 
       return claims.get("userId", String.class);
-    } else {
-      throw new RuntimeException("Token không hợp lệ");
-    }
-  }
-
-  public Integer getAccountType(String authHeader) {
-    String token = authHeader.replace("Bearer ", "");
-    if (validateToken(token)) {
-      Claims claims = Jwts.parserBuilder()
-        .setSigningKey(key)
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
-
-      return claims.get("accountType", Integer.class);
     } else {
       throw new RuntimeException("Token không hợp lệ");
     }
