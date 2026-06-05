@@ -12,10 +12,14 @@ public class LoanResponse {
   private String itemName;
   private Integer quantity;
   private Date borrowDate;
-  private Date expectedReturnDate;
+  private Integer borrowPeriod;
+  private Integer returnPeriod;
   private Date actualReturnDate;
   private Integer status;
   private String note;
+  // Trạng thái chậm trả tính động theo masterdata tiết + ngưỡng cấu hình
+  private Boolean isLate;
+  private Long lateMinutes;
   private Date createdDate;
   private Date modifiedDate;
 }

@@ -2,10 +2,15 @@ package com.codec.system.api;
 
 import codec.common.Response;
 import com.codec.system.application.command.request.loan.CreateLoanRequest;
+import com.codec.system.application.command.request.loan.LoanConfigRequest;
+import com.codec.system.application.command.request.loan.ReturnLoanRequest;
 import com.codec.system.application.command.request.loan.UpdateLoanRequest;
+import com.codec.system.application.command.response.loan.LoanConfigResponse;
 import com.codec.system.application.command.response.loan.LoanResponse;
+import com.codec.system.application.service.LoanConfigService;
 import com.codec.system.application.service.LoanService;
 import com.codec.system.application.service.authen.JwtUtil;
+import jakarta.validation.Valid;
 import com.codec.system.pagination.infrastructure.primary.RestCodecSystemApplicationPage;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
@@ -22,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class LoanController {
   LoanService loanService;
+  LoanConfigService loanConfigService;
   JwtUtil jwtUtil;
 
   @Operation(summary = "Danh sách phiếu mượn")
@@ -69,6 +75,21 @@ public class LoanController {
     return Mono.just(Response.ok().success("Cập nhật thành công", 201));
   }
 
+  @Operation(summary = "Ghi nhận trả phiếu mượn")
+  @PostMapping("/loan/return/{id}")
+  public Mono<Response<Object>> returnLoan(
+    @PathVariable("id") String id,
+    @RequestBody ReturnLoanRequest request,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "loan-u");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    loanService.returnLoan(id, request, userId);
+    return Mono.just(Response.ok().success("Ghi nhận trả thành công", 201));
+  }
+
   @Operation(summary = "Xóa phiếu mượn")
   @PostMapping("/loan/delete/{id}")
   public Mono<Response<Object>> deleteLoan(
@@ -81,5 +102,32 @@ public class LoanController {
     }
     loanService.deleteLoan(id, userId);
     return Mono.just(Response.ok().success("Xóa thành công", 201));
+  }
+
+  @Operation(summary = "Lấy cấu hình mượn trả (ngưỡng phút chậm trả)")
+  @GetMapping("/loan-config/get")
+  public Mono<Response<LoanConfigResponse>> getLoanConfig(
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "loan-config-v");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    LoanConfigResponse data = loanConfigService.getConfig().getData();
+    return Mono.just(Response.of(data).success("Thành công", 200));
+  }
+
+  @Operation(summary = "Lưu cấu hình mượn trả (ngưỡng phút chậm trả)")
+  @PostMapping("/loan-config/set")
+  public Mono<Response<Object>> setLoanConfig(
+    @RequestBody @Valid LoanConfigRequest request,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "loan-config-c");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    loanConfigService.saveConfig(request, userId);
+    return Mono.just(Response.ok().success("Thành công", 201));
   }
 }

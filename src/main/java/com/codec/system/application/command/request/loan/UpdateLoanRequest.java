@@ -12,13 +12,16 @@ public class UpdateLoanRequest {
   // Số lượng
   private Integer quantity;
 
-  // Ngày bắt đầu mượn
+  // Thời gian mượn
   private Date borrowDate;
 
-  // Ngày trả dự kiến
-  private Date expectedReturnDate;
+  // Tiết mượn
+  private Integer borrowPeriod;
 
-  // Ngày trả thực tế
+  // Tiết trả
+  private Integer returnPeriod;
+
+  // Thời gian trả thực tế
   private Date actualReturnDate;
 
   // Trạng thái: 1 - đang mượn, 2 - đã trả

@@ -34,15 +34,19 @@ public class LoanEntity extends BaseEntity {
   @Column(name = "quantity")
   Integer quantity;
 
-  @Comment("Ngày bắt đầu mượn")
+  @Comment("Thời gian mượn (ngày + giờ)")
   @Column(name = "borrow_date")
   Date borrowDate;
 
-  @Comment("Ngày trả dự kiến")
-  @Column(name = "expected_return_date")
-  Date expectedReturnDate;
+  @Comment("Tiết mượn (số tiết tham chiếu class_periods)")
+  @Column(name = "borrow_period")
+  Integer borrowPeriod;
 
-  @Comment("Ngày trả thực tế")
+  @Comment("Tiết trả (mốc tính hạn trả - giờ kết thúc tiết này)")
+  @Column(name = "return_period")
+  Integer returnPeriod;
+
+  @Comment("Thời gian trả thực tế (điền khi trả)")
   @Column(name = "actual_return_date")
   Date actualReturnDate;
 

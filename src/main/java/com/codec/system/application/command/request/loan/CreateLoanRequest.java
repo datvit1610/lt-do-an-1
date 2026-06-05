@@ -18,11 +18,14 @@ public class CreateLoanRequest {
   // Số lượng
   private Integer quantity;
 
-  // Ngày bắt đầu mượn
+  // Thời gian mượn (ngày + giờ)
   private Date borrowDate;
 
-  // Ngày trả dự kiến
-  private Date expectedReturnDate;
+  // Tiết mượn
+  private Integer borrowPeriod;
+
+  // Tiết trả (mốc tính hạn trả)
+  private Integer returnPeriod;
 
   // Ghi chú
   private String note;

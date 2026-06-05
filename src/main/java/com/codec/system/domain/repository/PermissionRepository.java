@@ -13,6 +13,8 @@ import java.util.List;
 @Repository
 public interface PermissionRepository extends JpaRepository<PermissionEntity, String> {
 
+  boolean existsByName(String name);
+
   @Query(value = """
       select p.id as permissionId, p.name as permissionName, p.description as description, p.groupId as groupId
       from PermissionEntity p
