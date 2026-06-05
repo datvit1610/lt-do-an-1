@@ -20,9 +20,9 @@ public class DeviceEntity extends BaseEntity {
   @Column(name = "name", nullable = false)
   String name;
 
-  @Comment("Số serial của thiết bị")
-  @Column(name = "serial_number", unique = true)
-  String serialNumber;
+  @Comment("Mã thiết bị")
+  @Column(name = "device_code", unique = true)
+  String deviceCode;
 
   @Comment("Loại thiết bị")
   @Column(name = "device_type")
@@ -36,9 +36,9 @@ public class DeviceEntity extends BaseEntity {
   @Column(name = "location")
   String location;
 
-  @Comment("Id người được gán thiết bị")
-  @Column(name = "assigned_user_id")
-  String assignedUserId;
+  @Comment("Số lượng")
+  @Column(name = "quantity")
+  Integer quantity;
 
   @Comment("Mô tả thiết bị")
   @Column(name = "description")

@@ -8,11 +8,11 @@ import java.util.Date;
 public class DeviceResponse {
   private String id;
   private String name;
-  private String serialNumber;
+  private String deviceCode;
   private String deviceType;
   private Integer status;
   private String location;
-  private String assignedUserId;
+  private Integer quantity;
   private String description;
   private Date createdDate;
   private Date modifiedDate;

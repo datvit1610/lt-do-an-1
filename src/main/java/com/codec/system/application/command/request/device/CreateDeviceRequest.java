@@ -7,8 +7,8 @@ public class CreateDeviceRequest {
   // Tên thiết bị
   private String name;
 
-  // Số serial thiết bị
-  private String serialNumber;
+  // Mã thiết bị
+  private String deviceCode;
 
   // Loại thiết bị
   private String deviceType;
@@ -19,8 +19,8 @@ public class CreateDeviceRequest {
   // Vị trí thiết bị
   private String location;
 
-  // Id người được gán
-  private String assignedUserId;
+  // Số lượng
+  private Integer quantity;
 
   // Mô tả thiết bị
   private String description;

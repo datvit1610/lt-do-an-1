@@ -8,9 +8,9 @@ import java.util.Date;
 @Data
 public class ClassPeriodResponse {
   private String id;
-  private Integer periodNumber;
-  private String shift;
-  private LocalTime startTime;
+  private Integer periodNumber; //số thứ tự tiết học
+  private String shift; //ca học
+  private LocalTime startTime; //thời gian bắt đầu
   private LocalTime endTime;
   private Date createdDate;
   private Date modifiedDate;

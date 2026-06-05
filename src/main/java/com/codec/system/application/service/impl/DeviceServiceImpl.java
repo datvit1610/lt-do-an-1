@@ -37,11 +37,11 @@ public class DeviceServiceImpl implements DeviceService {
       DeviceResponse r = new DeviceResponse();
       r.setId(entity.getId());
       r.setName(entity.getName());
-      r.setSerialNumber(entity.getSerialNumber());
+      r.setDeviceCode(entity.getDeviceCode());
       r.setDeviceType(entity.getDeviceType());
       r.setStatus(entity.getStatus());
       r.setLocation(entity.getLocation());
-      r.setAssignedUserId(entity.getAssignedUserId());
+      r.setQuantity(entity.getQuantity());
       r.setDescription(entity.getDescription());
       r.setCreatedDate(entity.getCreatedDate());
       r.setModifiedDate(entity.getModifiedDate());
@@ -67,11 +67,11 @@ public class DeviceServiceImpl implements DeviceService {
     DeviceResponse r = new DeviceResponse();
     r.setId(e.getId());
     r.setName(e.getName());
-    r.setSerialNumber(e.getSerialNumber());
+    r.setDeviceCode(e.getDeviceCode());
     r.setDeviceType(e.getDeviceType());
     r.setStatus(e.getStatus());
     r.setLocation(e.getLocation());
-    r.setAssignedUserId(e.getAssignedUserId());
+    r.setQuantity(e.getQuantity());
     r.setDescription(e.getDescription());
     r.setCreatedDate(e.getCreatedDate());
     r.setModifiedDate(e.getModifiedDate());
@@ -84,11 +84,11 @@ public class DeviceServiceImpl implements DeviceService {
     try {
       DeviceEntity device = new DeviceEntity();
       device.setName(request.getName());
-      device.setSerialNumber(request.getSerialNumber());
+      device.setDeviceCode(request.getDeviceCode());
       device.setDeviceType(request.getDeviceType());
       device.setStatus(request.getStatus());
       device.setLocation(request.getLocation());
-      device.setAssignedUserId(request.getAssignedUserId());
+      device.setQuantity(request.getQuantity());
       device.setDescription(request.getDescription());
       device.setCreatedBy(userId);
       deviceRepository.save(device);
@@ -108,11 +108,11 @@ public class DeviceServiceImpl implements DeviceService {
       }
       DeviceEntity d = entity.get();
       d.setName(request.getName());
-      d.setSerialNumber(request.getSerialNumber());
+      d.setDeviceCode(request.getDeviceCode());
       d.setDeviceType(request.getDeviceType());
       d.setStatus(request.getStatus());
       d.setLocation(request.getLocation());
-      d.setAssignedUserId(request.getAssignedUserId());
+      d.setQuantity(request.getQuantity());
       d.setDescription(request.getDescription());
       d.setModifiedDate(new Date());
       d.setModifiedBy(userId);
