@@ -29,16 +29,20 @@ public class DeviceController {
   @Operation(summary = "Danh sách thiết bị")
   @GetMapping("/device/get-all")
   public Mono<Response<RestCodecSystemApplicationPage<DeviceResponse>>> getAllDevice(
-    @ParameterObject Pageable pageable
+    @ParameterObject Pageable pageable,
+    @RequestParam(required = false) String deviceCode,
+    @RequestParam(required = false) String name,
+    @RequestParam(required = false) String deviceType,
+    @RequestParam(required = false) Integer status,
+    @RequestHeader("Authorization") String authHeader
   ) {
-    Response<RestCodecSystemApplicationPage<DeviceResponse>> data = deviceService.getAllDevice(pageable);
-    return Mono.just(Response.of(data.getData()).success("Thành công", 200));
-  }
-
-  @Operation(summary = "Lấy thiết bị theo id")
-  @GetMapping("/device/{id}")
-  public Mono<Response<DeviceResponse>> getDeviceById(@PathVariable("id") String id) {
-    Response<DeviceResponse> data = deviceService.getDeviceById(id);
+    String userId = jwtUtil.checkPermission(authHeader, "device-v");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    Response<RestCodecSystemApplicationPage<DeviceResponse>> data = deviceService.getAllDevice(
+      pageable, deviceCode, name, deviceType, status
+    );
     return Mono.just(Response.of(data.getData()).success("Thành công", 200));
   }
 

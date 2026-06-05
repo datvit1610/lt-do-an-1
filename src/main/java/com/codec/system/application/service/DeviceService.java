@@ -8,8 +8,9 @@ import com.codec.system.pagination.infrastructure.primary.RestCodecSystemApplica
 import org.springframework.data.domain.Pageable;
 
 public interface DeviceService {
-  Response<RestCodecSystemApplicationPage<DeviceResponse>> getAllDevice(Pageable pageable);
-  Response<DeviceResponse> getDeviceById(String id);
+  Response<RestCodecSystemApplicationPage<DeviceResponse>> getAllDevice(
+    Pageable pageable, String deviceCode, String name, String deviceType, Integer status
+  );
   void createDevice(CreateDeviceRequest request, String userId);
   void updateDevice(String id, UpdateDeviceRequest request, String userId);
   void deleteDevice(String id, String userId);

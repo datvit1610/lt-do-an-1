@@ -15,5 +15,5 @@ public class DeviceResponse {
   private Integer quantity;
   private String description;
   private Date createdDate;
-  private Date modifiedDate;
+  private String createdBy; // tên người tạo (join từ bảng users)
 }

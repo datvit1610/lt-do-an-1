@@ -31,20 +31,24 @@ public class DeviceServiceImpl implements DeviceService {
   DeviceRepository deviceRepository;
 
   @Override
-  public Response<RestCodecSystemApplicationPage<DeviceResponse>> getAllDevice(Pageable pageable) {
-    Page<DeviceEntity> page = deviceRepository.findAll(pageable);
-    List<DeviceResponse> responses = page.stream().map(entity -> {
+  public Response<RestCodecSystemApplicationPage<DeviceResponse>> getAllDevice(
+    Pageable pageable, String deviceCode, String name, String deviceType, Integer status
+  ) {
+    Page<Object[]> page = deviceRepository.findAllDevicesWithUserNames(
+      pageable, deviceCode, name, deviceType, status
+    );
+    List<DeviceResponse> responses = page.stream().map(row -> {
       DeviceResponse r = new DeviceResponse();
-      r.setId(entity.getId());
-      r.setName(entity.getName());
-      r.setDeviceCode(entity.getDeviceCode());
-      r.setDeviceType(entity.getDeviceType());
-      r.setStatus(entity.getStatus());
-      r.setLocation(entity.getLocation());
-      r.setQuantity(entity.getQuantity());
-      r.setDescription(entity.getDescription());
-      r.setCreatedDate(entity.getCreatedDate());
-      r.setModifiedDate(entity.getModifiedDate());
+      r.setId((String) row[0]);
+      r.setName((String) row[1]);
+      r.setDeviceCode((String) row[2]);
+      r.setDeviceType((String) row[3]);
+      r.setStatus((Integer) row[4]);
+      r.setLocation((String) row[5]);
+      r.setQuantity((Integer) row[6]);
+      r.setDescription((String) row[7]);
+      r.setCreatedDate((java.util.Date) row[8]);
+      r.setCreatedBy((String) row[9]); // full_name từ users table
       return r;
     }).toList();
 
@@ -55,27 +59,6 @@ public class DeviceServiceImpl implements DeviceService {
       CodecSystemApplicationPage.of(responses, codecPageable, currentCount), d -> d);
 
     return Response.of(rest).success("Thành công", 200);
-  }
-
-  @Override
-  public Response<DeviceResponse> getDeviceById(String id) {
-    Optional<DeviceEntity> entity = deviceRepository.findById(id);
-    if (entity.isEmpty() || Boolean.TRUE.equals(entity.get().getDeleted())) {
-      throw new RuntimeException("Thiết bị không tồn tại");
-    }
-    DeviceEntity e = entity.get();
-    DeviceResponse r = new DeviceResponse();
-    r.setId(e.getId());
-    r.setName(e.getName());
-    r.setDeviceCode(e.getDeviceCode());
-    r.setDeviceType(e.getDeviceType());
-    r.setStatus(e.getStatus());
-    r.setLocation(e.getLocation());
-    r.setQuantity(e.getQuantity());
-    r.setDescription(e.getDescription());
-    r.setCreatedDate(e.getCreatedDate());
-    r.setModifiedDate(e.getModifiedDate());
-    return Response.of(r).success("Thành công", 200);
   }
 
   @Override
