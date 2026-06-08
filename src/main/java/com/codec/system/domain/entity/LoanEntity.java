@@ -18,6 +18,10 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoanEntity extends BaseEntity {
 
+  @Comment("Mã phiếu mượn (tự sinh, duy nhất)")
+  @Column(name = "loan_code", unique = true)
+  String loanCode;
+
   @Comment("Id người mượn")
   @Column(name = "borrower_id", nullable = false)
   String borrowerId;
@@ -25,10 +29,6 @@ public class LoanEntity extends BaseEntity {
   @Comment("Id thiết bị (nếu mượn thiết bị có trong hệ thống)")
   @Column(name = "device_id")
   String deviceId;
-
-  @Comment("Tên món đồ mượn")
-  @Column(name = "item_name", nullable = false)
-  String itemName;
 
   @Comment("Số lượng mượn")
   @Column(name = "quantity")
@@ -50,12 +50,16 @@ public class LoanEntity extends BaseEntity {
   @Column(name = "actual_return_date")
   Date actualReturnDate;
 
-  @Comment("Trạng thái: 1 - đang mượn, 2 - đã trả")
+  @Comment("Trạng thái: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị")
   @Column(name = "status")
   Integer status;
 
   @Comment("Ghi chú")
   @Column(name = "note")
   String note;
+
+  @Comment("Số phút trả chậm (tính động theo masterdata tiết + ngưỡng cấu hình)")
+  @Column(name = "late_minutes")
+  Long lateMinutes;
 
 }

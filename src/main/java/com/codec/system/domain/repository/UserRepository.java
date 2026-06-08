@@ -43,4 +43,20 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
         """)
   List<String> findActiveUserIdsByRoleIds(@Param("roleIds") List<String> roleIds);
 
+  /**
+   * Đếm người dùng theo tên role, join sang bảng role.
+   * Dùng chung cho cả Giảng viên và Sinh viên.
+   *
+   * @param roleName tên role: "Giảng viên" hoặc "Sinh viên"
+   */
+  @Query("""
+            SELECT COUNT(u)
+            FROM UserEntity u
+            JOIN RoleEntity r ON r.id = u.roleId
+            WHERE u.deleted = false
+              AND r.deleted = false
+              AND r.name = :roleName
+            """)
+  Long countByRoleName(@Param("roleName") String roleName);
+
 }

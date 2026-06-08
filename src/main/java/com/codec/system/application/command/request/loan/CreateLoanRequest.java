@@ -12,9 +12,6 @@ public class CreateLoanRequest {
   // Id thiết bị (nếu có)
   private String deviceId;
 
-  // Tên món đồ mượn
-  private String itemName;
-
   // Số lượng
   private Integer quantity;
 

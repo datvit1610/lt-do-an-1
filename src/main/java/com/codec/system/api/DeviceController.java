@@ -3,6 +3,7 @@ package com.codec.system.api;
 import codec.common.Response;
 import com.codec.system.application.command.request.device.CreateDeviceRequest;
 import com.codec.system.application.command.request.device.UpdateDeviceRequest;
+import com.codec.system.application.command.response.device.DeviceOptionResponse;
 import com.codec.system.application.command.response.device.DeviceResponse;
 import com.codec.system.application.service.DeviceService;
 import com.codec.system.application.service.authen.JwtUtil;
@@ -43,6 +44,16 @@ public class DeviceController {
     Response<RestCodecSystemApplicationPage<DeviceResponse>> data = deviceService.getAllDevice(
       pageable, deviceCode, name, deviceType, status
     );
+    return Mono.just(Response.of(data.getData()).success("Thành công", 200));
+  }
+
+  @Operation(summary = "Danh sách thiết bị rút gọn (id, name) để chọn lúc tạo phiếu mượn")
+  @GetMapping("/device/select")
+  public Mono<Response<List<DeviceOptionResponse>>> getDeviceOptions(
+    @RequestParam(required = false) String name,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    Response<List<DeviceOptionResponse>> data = deviceService.getDeviceOptions(name);
     return Mono.just(Response.of(data.getData()).success("Thành công", 200));
   }
 

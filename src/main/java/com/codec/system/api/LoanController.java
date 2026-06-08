@@ -13,13 +13,17 @@ import com.codec.system.application.service.authen.JwtUtil;
 import jakarta.validation.Valid;
 import com.codec.system.pagination.infrastructure.primary.RestCodecSystemApplicationPage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 
 @RequestMapping("/api/v1")
 @RestController
@@ -33,16 +37,48 @@ public class LoanController {
   @Operation(summary = "Danh sách phiếu mượn")
   @GetMapping("/loan/get-all")
   public Mono<Response<RestCodecSystemApplicationPage<LoanResponse>>> getAllLoan(
-    @ParameterObject Pageable pageable
+    @Parameter(description = "Mã phiếu mượn (tìm gần đúng, không phân biệt hoa thường)")
+    @RequestParam(required = false) String loanCode,
+    @Parameter(description = "Tên người mượn (tìm gần đúng, không phân biệt hoa thường)")
+    @RequestParam(required = false) String borrowerName,
+    @Parameter(description = "Trạng thái: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị")
+    @RequestParam(required = false) Integer status,
+    @Parameter(description = "Mượn từ ngày (yyyy-MM-dd)")
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+    @Parameter(description = "Mượn đến ngày (yyyy-MM-dd)")
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+    @ParameterObject Pageable pageable,
+    @RequestHeader("Authorization") String authHeader
   ) {
-    Response<RestCodecSystemApplicationPage<LoanResponse>> data = loanService.getAllLoan(pageable);
+    String userId = jwtUtil.checkPermission(authHeader, "loan-v-admin");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    Response<RestCodecSystemApplicationPage<LoanResponse>> data =
+      loanService.getAllLoan(loanCode, borrowerName, status, fromDate, toDate, pageable);
     return Mono.just(Response.of(data.getData()).success("Thành công", 200));
   }
 
-  @Operation(summary = "Lấy phiếu mượn theo id")
-  @GetMapping("/loan/{id}")
-  public Mono<Response<LoanResponse>> getLoanById(@PathVariable("id") String id) {
-    Response<LoanResponse> data = loanService.getLoanById(id);
+  @Operation(summary = "Danh sách phiếu mượn tự xem của user")
+  @GetMapping("/loan/get-all-for-user")
+  public Mono<Response<RestCodecSystemApplicationPage<LoanResponse>>> getAllLoanForUser(
+    @Parameter(description = "Mã phiếu mượn (tìm gần đúng, không phân biệt hoa thường)")
+    @RequestParam(required = false) String loanCode,
+    @Parameter(description = "Trạng thái: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị")
+    @RequestParam(required = false) Integer status,
+    @Parameter(description = "Mượn từ ngày (yyyy-MM-dd)")
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+    @Parameter(description = "Mượn đến ngày (yyyy-MM-dd)")
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+    @ParameterObject Pageable pageable,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "loan-v-user");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    Response<RestCodecSystemApplicationPage<LoanResponse>> data =
+      loanService.getAllLoanForUser(loanCode, status, fromDate, toDate, pageable, userId);
     return Mono.just(Response.of(data.getData()).success("Thành công", 200));
   }
 

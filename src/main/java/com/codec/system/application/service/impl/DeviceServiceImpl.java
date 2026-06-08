@@ -3,6 +3,7 @@ package com.codec.system.application.service.impl;
 import codec.common.Response;
 import com.codec.system.application.command.request.device.CreateDeviceRequest;
 import com.codec.system.application.command.request.device.UpdateDeviceRequest;
+import com.codec.system.application.command.response.device.DeviceOptionResponse;
 import com.codec.system.application.command.response.device.DeviceResponse;
 import com.codec.system.application.service.DeviceService;
 import com.codec.system.domain.entity.DeviceEntity;
@@ -59,6 +60,12 @@ public class DeviceServiceImpl implements DeviceService {
       CodecSystemApplicationPage.of(responses, codecPageable, currentCount), d -> d);
 
     return Response.of(rest).success("Thành công", 200);
+  }
+
+  @Override
+  public Response<List<DeviceOptionResponse>> getDeviceOptions(String name) {
+    List<DeviceOptionResponse> options = deviceRepository.findDeviceOptions(name).stream().map(DeviceOptionResponse::new).toList();
+    return Response.of(options).success("Thành công", 200);
   }
 
   @Override
