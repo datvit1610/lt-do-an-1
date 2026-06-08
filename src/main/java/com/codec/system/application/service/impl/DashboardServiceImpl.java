@@ -1,11 +1,13 @@
 package com.codec.system.application.service.impl;
 
 import com.codec.system.application.command.response.dashboard.DashboardOverviewResponse;
+import com.codec.system.application.command.response.dashboard.LoanStatusResponse;
 import com.codec.system.application.command.response.dashboard.Top5DeviceResponse;
 import com.codec.system.application.service.DashboardService;
 import com.codec.system.domain.repository.DeviceRepository;
 import com.codec.system.domain.repository.LoanRepository;
 import com.codec.system.domain.repository.UserRepository;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,6 +85,21 @@ public class DashboardServiceImpl implements DashboardService {
     log.info("[Dashboard] Top5 fromDate={}, toDate={}", fromDate, toDate);
 
     return loanRepository.findTop5BorrowedDevices(fromDate, toDate).stream().map(Top5DeviceResponse::new).toList();
+  }
+
+  /**
+   * Thống kê phiếu mượn theo trạng thái — dùng cho biểu đồ tròn.
+   * Native query trả về Object[], parse thủ công để tương thích
+   * với cả MySQL (BigInteger/BigDecimal) và H2 test (Long).
+   */
+  @Override
+  public LoanStatusResponse getLoanStatusStats(Date fromDate, Date toDate) {
+    toDate   = toDate   == null ? endOfDay(new Date())            : endOfDay(toDate);
+    fromDate = fromDate == null ? startOfDay(daysAgo(toDate, 30)) : startOfDay(fromDate);
+    log.info("[Dashboard] LoanStatus fromDate={}, toDate={}", fromDate, toDate);
+
+    Tuple tuple = loanRepository.countLoansByStatus(fromDate, toDate);
+    return new LoanStatusResponse(tuple);
   }
 
   // ── Helpers ──────────────────────────────────────────

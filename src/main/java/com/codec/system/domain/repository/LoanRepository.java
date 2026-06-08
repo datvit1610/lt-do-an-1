@@ -153,4 +153,24 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
     @Param("fromDate") Date fromDate,
     @Param("toDate") Date toDate
   );
+
+  /**
+   * Thống kê phiếu mượn theo trạng thái — trả về Tuple để map vào DTO.
+   * Dùng JPQL SUM+CASE, alias khớp với tên field trong LoanStatusStatsResponse.
+   */
+  @Query("""
+            SELECT
+                SUM(CASE WHEN l.status = 1 THEN 1L ELSE 0L END) AS borrowing,
+                SUM(CASE WHEN l.status = 2 THEN 1L ELSE 0L END) AS returned,
+                SUM(CASE WHEN l.status = 3 THEN 1L ELSE 0L END) AS lateReturn,
+                SUM(CASE WHEN l.status = 4 THEN 1L ELSE 0L END) AS lost
+            FROM LoanEntity l
+            WHERE l.deleted = false
+              AND l.borrowDate >= :fromDate
+              AND l.borrowDate <= :toDate
+            """)
+  Tuple countLoansByStatus(
+    @Param("fromDate") Date fromDate,
+    @Param("toDate") Date toDate
+  );
 }
