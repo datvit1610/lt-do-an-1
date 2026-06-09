@@ -32,6 +32,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
            l.return_period      AS "returnPeriod",
            l.actual_return_date AS "actualReturnDate",
            l.status             AS "status",
+           l.status             AS "statusSaving",
            l.note               AS "note",
            l.created_date       AS "createdDate",
            l.modified_date      AS "modifiedDate"
@@ -69,6 +70,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
            l.return_period      AS "returnPeriod",
            l.actual_return_date AS "actualReturnDate",
            l.status             AS "status",
+           l.status             AS "statusSaving",
            l.note               AS "note",
            l.created_date       AS "createdDate",
            l.modified_date      AS "modifiedDate"
@@ -170,6 +172,78 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
               AND l.borrowDate <= :toDate
             """)
   Tuple countLoansByStatus(
+    @Param("fromDate") Date fromDate,
+    @Param("toDate") Date toDate
+  );
+
+  /**
+   * Xu hướng mượn theo ngày — group by DATE(borrow_date).
+   * Trả về [date_str, count] để service tự format label.
+   */
+  @Query(value = """
+            SELECT DATE(l.borrow_date)  AS period,
+                   COUNT(l.id)          AS loans
+            FROM loans l
+            WHERE l.deleted = false
+              AND l.borrow_date >= :fromDate
+              AND l.borrow_date <= :toDate
+            GROUP BY DATE(l.borrow_date)
+            ORDER BY period ASC
+            """, nativeQuery = true)
+  List<Object[]> findTrendByDay(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
+
+  /**
+   * Xu hướng mượn theo tuần — group by YEAR + WEEK.
+   * WEEK(...,3) dùng ISO week (thứ 2 là đầu tuần).
+   */
+  @Query(value = """
+        SELECT EXTRACT(YEAR FROM l.borrow_date) * 100 + EXTRACT(WEEK FROM l.borrow_date) AS period,
+               COUNT(l.id) AS loans
+        FROM loans l
+        WHERE l.deleted = false
+          AND l.borrow_date >= :fromDate
+          AND l.borrow_date <= :toDate
+        GROUP BY EXTRACT(YEAR FROM l.borrow_date), EXTRACT(WEEK FROM l.borrow_date)
+        ORDER BY period ASC
+        """, nativeQuery = true)
+  List<Object[]> findTrendByWeek(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
+
+  /**
+   * Xu hướng mượn theo tháng — group by YEAR + MONTH.
+   */
+  @Query(value = """
+    SELECT TO_CHAR(l.borrow_date, 'YYYY-MM') AS period,
+           COUNT(l.id) AS loans
+    FROM loans l
+    WHERE l.deleted = false
+      AND l.borrow_date >= :fromDate
+      AND l.borrow_date <= :toDate
+    GROUP BY TO_CHAR(l.borrow_date, 'YYYY-MM')
+    ORDER BY period ASC
+    """, nativeQuery = true)
+  List<Object[]> findTrendByMonth(
+    @Param("fromDate") Date fromDate,
+    @Param("toDate") Date toDate
+  );
+
+  /**
+   * Thống kê lượt mượn theo device_type.
+   * NULL device_type được gom vào nhóm "Khác".
+   */
+  @Query(value = """
+            SELECT COALESCE(d.device_type, 'Khác') AS deviceType,
+                   COUNT(l.id)                      AS totalLoans
+            FROM loans l
+            JOIN devices d ON d.id = l.device_id
+            WHERE l.deleted = false
+              AND d.deleted = false
+              AND l.device_id IS NOT NULL
+              AND l.borrow_date >= :fromDate
+              AND l.borrow_date <= :toDate
+            GROUP BY COALESCE(d.device_type, 'Khác')
+            ORDER BY totalLoans DESC
+            """, nativeQuery = true)
+  List<Object[]> findLoansByDeviceType(
     @Param("fromDate") Date fromDate,
     @Param("toDate") Date toDate
   );

@@ -1,11 +1,10 @@
 package com.codec.system.api;
 
 import codec.common.Response;
-import com.codec.system.application.command.response.dashboard.DashboardOverviewResponse;
-import com.codec.system.application.command.response.dashboard.LoanStatusResponse;
-import com.codec.system.application.command.response.dashboard.Top5DeviceResponse;
+import com.codec.system.application.command.response.dashboard.*;
 import com.codec.system.application.service.DashboardService;
 import com.codec.system.application.service.authen.JwtUtil;
+import com.codec.system.common.utils.TrendMode;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -49,7 +48,7 @@ public class DashboardController {
   }
 
   @Operation(summary = "Top 5 thiết bị được mượn nhiều nhất trong khoảng thời gian ( đường ngang )")
-  @GetMapping("/top5-devices")
+  @GetMapping("/dashboard/top5-devices")
   public Mono<Response<List<Top5DeviceResponse>>> getTop5BorrowedDevices(
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
@@ -64,7 +63,7 @@ public class DashboardController {
   }
 
   @Operation(summary = "Thống kê phiếu mượn theo trạng thái: đang mượn, đã trả, trả chậm, mất thiết bị ( tròn )")
-  @GetMapping("/loan-status-stats")
+  @GetMapping("/dashboard/loan-status-stats")
   public Mono<Response<LoanStatusResponse>> getLoanStatusStats(
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
@@ -75,6 +74,33 @@ public class DashboardController {
       return Mono.just(Response.fail(userId, 403));
     }
     LoanStatusResponse data = dashboardService.getLoanStatusStats(fromDate, toDate);
+    return Mono.just(Response.of(data).success("Thành công", 200));
+  }
+
+  @Operation(summary = "Xu hướng lượt mượn theo thời gian — dùng cho biểu đồ line")
+  @GetMapping("/dashboard/loan-trend")
+  public Mono<Response<LoanTrendResponse>> getLoanTrend(
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
+    @RequestParam(required = false) TrendMode groupBy,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "das-v");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    LoanTrendResponse data = dashboardService.getLoanTrend(fromDate, toDate, groupBy);
+    return Mono.just(Response.of(data).success("Thành công", 200));
+  }
+
+  @Operation(summary = "Thống kê lượt mượn theo loại thiết bị — dùng cho biểu đồ donut")
+  @GetMapping("/dashboard/device-type-stats")
+  public Mono<Response<DeviceTypeLoanResponse>> getLoansByDeviceType(
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    DeviceTypeLoanResponse data = dashboardService.getLoansByDeviceType(fromDate, toDate);
     return Mono.just(Response.of(data).success("Thành công", 200));
   }
 }

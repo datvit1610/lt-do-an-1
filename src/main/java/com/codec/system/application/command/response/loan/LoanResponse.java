@@ -24,6 +24,7 @@ public class LoanResponse {
   private Date actualReturnDate; // Thời gian trả thực tế (điền khi trả)
   // Trạng thái: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị
   private Integer status;
+  private Integer statusSaving; //Trạng thái khi lưu tạm: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị
   private String note;
   // Số phút trả chậm (tính động theo masterdata tiết + ngưỡng cấu hình)
   private Long lateMinutes; //Số phút trả chậm
@@ -45,6 +46,7 @@ public class LoanResponse {
     this.returnPeriod = tuple.get("returnPeriod", Integer.class);
     this.actualReturnDate = tuple.get("actualReturnDate", Date.class);
     this.status = tuple.get("status", Integer.class);
+    this.statusSaving = tuple.get("statusSaving", Integer.class);
     this.note = tuple.get("note", String.class);
 //    this.lateMinutes = tuple.get("lateMinutes", Long.class);
     this.createdDate = tuple.get("createdDate", Date.class);
