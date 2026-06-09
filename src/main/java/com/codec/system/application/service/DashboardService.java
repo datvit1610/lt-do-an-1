@@ -12,4 +12,6 @@ public interface DashboardService {
   LoanStatusResponse getLoanStatusStats(Date fromDate, Date toDate);
   LoanTrendResponse getLoanTrend(Date fromDate, Date toDate, TrendMode mode);
   DeviceTypeLoanResponse getLoansByDeviceType(Date fromDate, Date toDate);
+  List<TopBorrowerResponse> getTopBorrowers(Date fromDate, Date toDate,
+                                            String roleName, int topN);
 }

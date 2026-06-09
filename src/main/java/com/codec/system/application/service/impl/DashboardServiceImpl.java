@@ -166,6 +166,26 @@ public class DashboardServiceImpl implements DashboardService {
     return new DeviceTypeLoanResponse(items, total, mostPopular);
   }
 
+  /**
+   * @param roleName null = tất cả | "Sinh viên" | "Giảng viên"
+   * @param topN     số lượng kết quả, mặc định 10
+   */
+  @Override
+  public List<TopBorrowerResponse> getTopBorrowers(Date fromDate, Date toDate,
+                                                   String roleName, int topN) {
+    toDate   = toDate   == null ? endOfDay(new Date())            : endOfDay(toDate);
+    fromDate = fromDate == null ? startOfDay(daysAgo(toDate, 30)) : startOfDay(fromDate);
+    if (topN <= 0) topN = 10;
+
+    // Chuẩn hóa roleName rỗng về null để query không filter
+    if (roleName != null && roleName.isBlank()) roleName = null;
+
+    log.info("[TopBorrower] fromDate={}, toDate={}, roleName={}, topN={}",
+      fromDate, toDate, roleName, topN);
+
+    return loanRepository.findTopBorrowers(fromDate, toDate, roleName, topN).stream().map(TopBorrowerResponse::new).toList();
+  }
+
   // ── Helpers ──────────────────────────────────────────
 
   /**

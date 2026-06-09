@@ -1,6 +1,7 @@
 package com.codec.system.domain.repository;
 
 import com.codec.system.application.command.response.dashboard.Top5DeviceResponse;
+import com.codec.system.application.command.response.dashboard.TopBorrowerResponse;
 import com.codec.system.domain.entity.LoanEntity;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
@@ -246,5 +247,33 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
   List<Object[]> findLoansByDeviceType(
     @Param("fromDate") Date fromDate,
     @Param("toDate") Date toDate
+  );
+
+  /**
+   * PostgreSQL — không dùng YEARWEEK/DATE_FORMAT.
+   * :roleName = null → lấy tất cả (dùng CAST trick để bypass null check trong native)
+   */
+  @Query(value = """
+            SELECT l.borrower_id            AS borrowerId,
+                   u.full_name              AS fullName,
+                   r.name                   AS roleName,
+                   COUNT(l.id)              AS totalLoans
+            FROM loans l
+            JOIN users u ON u.id = l.borrower_id
+            JOIN role  r ON r.id = u.role_id
+            WHERE l.deleted = false
+              AND u.deleted = false
+              AND l.borrow_date >= :fromDate
+              AND l.borrow_date <= :toDate
+              AND (:roleName IS NULL OR r.name = :roleName)
+            GROUP BY l.borrower_id, u.full_name, r.name
+            ORDER BY totalLoans DESC
+            LIMIT :topN
+            """, nativeQuery = true)
+  List<Tuple> findTopBorrowers(
+    @Param("fromDate") Date   fromDate,
+    @Param("toDate")   Date   toDate,
+    @Param("roleName") String roleName,
+    @Param("topN")     int    topN
   );
 }

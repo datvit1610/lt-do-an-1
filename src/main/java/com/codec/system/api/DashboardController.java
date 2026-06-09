@@ -100,7 +100,28 @@ public class DashboardController {
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
     @RequestHeader("Authorization") String authHeader
   ) {
+    String userId = jwtUtil.checkPermission(authHeader, "das-v");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
     DeviceTypeLoanResponse data = dashboardService.getLoansByDeviceType(fromDate, toDate);
+    return Mono.just(Response.of(data).success("Thành công", 200));
+  }
+
+  @Operation(summary = "Top người mượn nhiều nhất — filter theo vai trò: Sinh viên / Giảng viên / tất cả")
+  @GetMapping("/dashboard/top-borrowers")
+  public Mono<Response<List<TopBorrowerResponse>>> getTopBorrowers(
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
+    @RequestParam(required = false) String roleName,
+    @RequestParam(defaultValue = "10") int topN,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "das-v");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    List<TopBorrowerResponse> data = dashboardService.getTopBorrowers(fromDate, toDate, roleName, topN);
     return Mono.just(Response.of(data).success("Thành công", 200));
   }
 }
