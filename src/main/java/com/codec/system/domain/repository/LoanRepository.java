@@ -19,6 +19,22 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
 
   boolean existsByLoanCode(String loanCode);
 
+  /**
+   * Quét phiếu mượn để phát hiện trả chậm:
+   * - status = 1 (đang mượn), chưa xóa
+   * - borrow_date nằm trong khoảng [start, end] (thường là trong ngày hôm nay)
+   */
+  @Query("""
+      SELECT l
+      FROM LoanEntity l
+      WHERE l.status = 1
+        AND l.deleted = false
+        AND l.borrowDate >= :start
+        AND l.borrowDate <= :end
+      """)
+  List<LoanEntity> findActiveLoansForLateCheck(@Param("start") Date start,
+                                               @Param("end") Date end);
+
   @Query(value = """
     SELECT l.id                 AS "id",
            l.loan_code          AS "loanCode",
@@ -35,6 +51,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
            l.status             AS "status",
            l.status             AS "statusSaving",
            l.note               AS "note",
+           l.approve_status     AS "approveStatus",
            l.created_date       AS "createdDate",
            l.modified_date      AS "modifiedDate"
     FROM loans l
@@ -46,6 +63,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
       AND (CAST(:borrowerName AS TEXT) IS NULL OR CAST(:borrowerName AS TEXT) = ''
            OR LOWER(u.full_name) LIKE LOWER(CONCAT('%', CAST(:borrowerName AS TEXT), '%')))
       AND (CAST(:status AS INTEGER) IS NULL OR l.status = CAST(:status AS INTEGER))
+      AND (CAST(:approveStatus AS INTEGER) IS NULL OR l.approve_status = CAST(:approveStatus AS INTEGER))
       AND (CAST(:fromDate AS TIMESTAMP) IS NULL OR l.borrow_date >= CAST(:fromDate AS TIMESTAMP))
       AND (CAST(:toDate AS TIMESTAMP) IS NULL OR l.borrow_date <= CAST(:toDate AS TIMESTAMP))
     ORDER BY l.created_date DESC
@@ -53,6 +71,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
   Page<Tuple> getAllLoan(@Param("loanCode") String loanCode,
                          @Param("borrowerName") String borrowerName,
                          @Param("status") Integer status,
+                         @Param("approveStatus") Integer approveStatus,
                          @Param("fromDate") Date fromDate,
                          @Param("toDate") Date toDate,
                          Pageable pageable);
@@ -73,6 +92,7 @@ public interface LoanRepository extends JpaRepository<LoanEntity, String> {
            l.status             AS "status",
            l.status             AS "statusSaving",
            l.note               AS "note",
+           l.approve_status     AS "approveStatus",
            l.created_date       AS "createdDate",
            l.modified_date      AS "modifiedDate"
     FROM loans l

@@ -126,13 +126,14 @@ public class LoanServiceImpl implements LoanService {
 
   @Override
   public Response<RestCodecSystemApplicationPage<LoanResponse>> getAllLoan(String loanCode, String borrowerName,
-                                                                           Integer status, LocalDate fromDate,
+                                                                           Integer status, Integer approveStatus,
+                                                                           LocalDate fromDate,
                                                                            LocalDate toDate, Pageable pageable) {
     // Lọc theo khoảng ngày mượn: from = đầu ngày, to = cuối ngày (bao trọn cả ngày).
     Date from = fromDate != null ? Date.from(fromDate.atStartOfDay(ZONE).toInstant()) : null;
     Date to = toDate != null ? Date.from(toDate.atTime(LocalTime.MAX).atZone(ZONE).toInstant()) : null;
 
-    Page<Tuple> page = loanRepository.getAllLoan(loanCode, borrowerName, status, from, to, pageable);
+    Page<Tuple> page = loanRepository.getAllLoan(loanCode, borrowerName, status, approveStatus, from, to, pageable);
     Map<Integer, ClassPeriodEntity> periodMap = loadPeriodMap();
     int threshold = loanConfigService.getLateThresholdMinutes();
 
@@ -318,6 +319,31 @@ public class LoanServiceImpl implements LoanService {
       }
       LoanEntity l = entity.get();
       l.setDeleted(true);
+      l.setModifiedDate(new Date());
+      l.setModifiedBy(userId);
+      loanRepository.save(l);
+    } catch (Exception e) {
+      throw new RuntimeException("Gặp lỗi: " + e.getMessage());
+    }
+  }
+
+  @Override
+  @Transactional
+  public void approveLoan(String id, Integer approveStatus, String userId) {
+    try {
+      // Chỉ chấp nhận duyệt (1) hoặc hủy (2); không cho set về 0 (chưa duyệt).
+      if (approveStatus == null || (approveStatus != 1 && approveStatus != 2)) {
+        throw new RuntimeException("Trạng thái duyệt không hợp lệ (chỉ nhận 1 - duyệt hoặc 2 - hủy)");
+      }
+      LoanEntity l = loanRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Phiếu mượn không tồn tại"));
+      if (Boolean.TRUE.equals(l.getDeleted())) {
+        throw new RuntimeException("Phiếu mượn không tồn tại");
+      }
+
+      l.setApproveStatus(approveStatus);
+      l.setApprovedBy(userId);
+      l.setApprovedDate(new Date());
       l.setModifiedDate(new Date());
       l.setModifiedBy(userId);
       loanRepository.save(l);

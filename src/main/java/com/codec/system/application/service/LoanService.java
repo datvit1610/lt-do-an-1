@@ -12,7 +12,8 @@ import java.time.LocalDate;
 
 public interface LoanService {
   Response<RestCodecSystemApplicationPage<LoanResponse>> getAllLoan(String loanCode, String borrowerName,
-                                                                    Integer status, LocalDate fromDate,
+                                                                    Integer status, Integer approveStatus,
+                                                                    LocalDate fromDate,
                                                                     LocalDate toDate, Pageable pageable);
   Response<RestCodecSystemApplicationPage<LoanResponse>> getAllLoanForUser(String loanCode,
                                                                     Integer status, LocalDate fromDate,
@@ -21,4 +22,5 @@ public interface LoanService {
   void updateLoan(String id, UpdateLoanRequest request, String userId);
   void returnLoan(String id, ReturnLoanRequest request, String userId);
   void deleteLoan(String id, String userId);
+  void approveLoan(String id, Integer approveStatus, String userId);
 }

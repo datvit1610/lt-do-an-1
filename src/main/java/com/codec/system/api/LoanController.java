@@ -1,6 +1,7 @@
 package com.codec.system.api;
 
 import codec.common.Response;
+import com.codec.system.application.command.request.loan.ApproveLoanRequest;
 import com.codec.system.application.command.request.loan.CreateLoanRequest;
 import com.codec.system.application.command.request.loan.LoanConfigRequest;
 import com.codec.system.application.command.request.loan.ReturnLoanRequest;
@@ -43,6 +44,8 @@ public class LoanController {
     @RequestParam(required = false) String borrowerName,
     @Parameter(description = "Trạng thái: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị")
     @RequestParam(required = false) Integer status,
+    @Parameter(description = "Trạng thái duyệt: 0 - chưa duyệt, 1 - đã duyệt, 2 - hủy")
+    @RequestParam(required = false) Integer approveStatus,
     @Parameter(description = "Mượn từ ngày (yyyy-MM-dd)")
     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
     @Parameter(description = "Mượn đến ngày (yyyy-MM-dd)")
@@ -55,7 +58,7 @@ public class LoanController {
       return Mono.just(Response.fail(userId, 403));
     }
     Response<RestCodecSystemApplicationPage<LoanResponse>> data =
-      loanService.getAllLoan(loanCode, borrowerName, status, fromDate, toDate, pageable);
+      loanService.getAllLoan(loanCode, borrowerName, status, approveStatus, fromDate, toDate, pageable);
     return Mono.just(Response.of(data.getData()).success("Thành công", 200));
   }
 
@@ -138,6 +141,21 @@ public class LoanController {
     }
     loanService.deleteLoan(id, userId);
     return Mono.just(Response.ok().success("Xóa thành công", 201));
+  }
+
+  @Operation(summary = "Duyệt / hủy phiếu mượn")
+  @PutMapping("/loan/{id}/approve")
+  public Mono<Response<Void>> approveLoan(
+    @PathVariable("id") String id,
+    @RequestBody ApproveLoanRequest request,
+    @RequestHeader("Authorization") String authHeader
+  ) {
+    String userId = jwtUtil.checkPermission(authHeader, "loan-u");
+    if (userId.equals("Api không có quyền truy cập") || userId.equals("Token không hợp lệ")) {
+      return Mono.just(Response.fail(userId, 403));
+    }
+    loanService.approveLoan(id, request.getApproveStatus(), userId);
+    return Mono.just(Response.<Void>ok().success("Duyệt phiếu mượn thành công", 200));
   }
 
   @Operation(summary = "Lấy cấu hình mượn trả (ngưỡng phút chậm trả)")

@@ -26,6 +26,8 @@ public class LoanResponse {
   private Integer status;
   private Integer statusSaving; //Trạng thái khi lưu tạm: 1 - đang mượn, 2 - đã trả, 3 - Trả chậm, 4 - Mất thiết bị
   private String note;
+  // Trạng thái duyệt: 0 - chưa duyệt, 1 - đã duyệt, 2 - hủy
+  private Integer approveStatus;
   // Số phút trả chậm (tính động theo masterdata tiết + ngưỡng cấu hình)
   private Long lateMinutes; //Số phút trả chậm
   private Date createdDate;
@@ -48,6 +50,7 @@ public class LoanResponse {
     this.status = tuple.get("status", Integer.class);
     this.statusSaving = tuple.get("statusSaving", Integer.class);
     this.note = tuple.get("note", String.class);
+    this.approveStatus = tuple.get("approveStatus", Integer.class);
 //    this.lateMinutes = tuple.get("lateMinutes", Long.class);
     this.createdDate = tuple.get("createdDate", Date.class);
     this.modifiedDate = tuple.get("modifiedDate", Date.class);

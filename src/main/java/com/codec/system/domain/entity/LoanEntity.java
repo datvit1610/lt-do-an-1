@@ -62,4 +62,16 @@ public class LoanEntity extends BaseEntity {
   @Column(name = "late_minutes")
   Long lateMinutes;
 
+  @Comment("Trạng thái duyệt: 0 - chưa duyệt (mặc định), 1 - đã duyệt, 2 - hủy")
+  @Column(name = "approve_status")
+  Integer approveStatus = 0;
+
+  @Comment("Id admin duyệt phiếu (userId)")
+  @Column(name = "approved_by")
+  String approvedBy;
+
+  @Comment("Thời gian duyệt phiếu")
+  @Column(name = "approved_date")
+  Date approvedDate;
+
 }
